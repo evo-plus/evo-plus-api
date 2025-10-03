@@ -14,11 +14,6 @@ repositories {
     mavenCentral()
 }
 
-
-dependencies {
-
-}
-
 tasks.register<Jar>("sourcesJar") {
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
@@ -34,6 +29,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
+            artifact(tasks["sourcesJar"])
         }
     }
 }
