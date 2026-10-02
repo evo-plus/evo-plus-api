@@ -1,0 +1,19 @@
+{
+  "example.settings.general": "Основное",
+  "example.settings.enabled": "Включён",
+  "example.settings.enabled.description": "Включает и выключает весь аддон",
+  "example.settings.greeting": "Приветствие",
+  "example.settings.greeting.description": "Текст уведомления по клавише",
+  "example.settings.notify-key": "Клавиша уведомления",
+  "example.settings.accent": "Цвет акцента",
+  "example.settings.mode": "Формат часов",
+  "example.settings.mode.seconds": "С секундами",
+  "example.settings.mode.minutes": "Часы и минуты",
+  "example.settings.counter": "Счётчик кликов",
+  "example.settings.counter.description": "Живёт в собственном конфиге аддона, EvoPlus его только показывает",
+  "example.settings.reset": "Сбросить счётчик",
+  "example.settings.reset.label": "Сбросить",
+  "example.widget": "Виджет",
+  "example.widget.clock": "Пример: часы",
+  "example.widget.clock.description": "Показывает время и счётчик кликов"
+}

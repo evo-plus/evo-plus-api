@@ -1,0 +1,19 @@
+{
+  "example.settings.general": "General",
+  "example.settings.enabled": "Enabled",
+  "example.settings.enabled.description": "Turns the whole addon on and off",
+  "example.settings.greeting": "Greeting",
+  "example.settings.greeting.description": "Text of the notification shown by the key",
+  "example.settings.notify-key": "Notification key",
+  "example.settings.accent": "Accent color",
+  "example.settings.mode": "Clock format",
+  "example.settings.mode.seconds": "With seconds",
+  "example.settings.mode.minutes": "Hours and minutes",
+  "example.settings.counter": "Click counter",
+  "example.settings.counter.description": "Lives in the addon's own config, EvoPlus only shows it",
+  "example.settings.reset": "Reset counter",
+  "example.settings.reset.label": "Reset",
+  "example.widget": "Widget",
+  "example.widget.clock": "Example: clock",
+  "example.widget.clock.description": "Shows the time and the click counter"
+}
