@@ -1,0 +1,7 @@
+jdk:
+  - openjdk21
+before_install:
+  - sdk install gradle 8.14.1
+  - sdk use gradle 8.14.1
+install:
+  - gradle -Pversion=$VERSION publishToMavenLocal

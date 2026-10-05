@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.evo-plus:evo-plus-api:1.4.0'
+    compileOnly 'com.github.evo-plus:evo-plus-api:1.4.1'
 }
 ```
 
@@ -466,6 +466,7 @@ Path history = addon.getAddonFolder().resolve("history.json");
 
 | Версия | Что нового |
 |---|---|
+| 1.4.1 | сборка на JitPack (без изменений API) |
 | 1.4.0 | `Addon.getAddonFolder()` — папка для файлов аддона в `evo-plus/addons/<id>` |
 | 1.3.0 | интерфейс: окна, диалоги и элементы EvoPlus (`Addon.getUi()`), `custom` и скрытые категории настроек, `settingsWindow`; темы (`Ui.registerTheme`, `SurfaceRenderer`), скругления, градиенты и тени в `RenderContext` |
 | 1.2.0 | виджеты аддонов, `RenderContext` |
