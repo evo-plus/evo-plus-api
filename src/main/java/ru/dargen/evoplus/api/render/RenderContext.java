@@ -3,7 +3,7 @@ package ru.dargen.evoplus.api.render;
 import java.util.function.Consumer;
 
 /**
- * Отрисовка внутри виджета аддона.
+ * Отрисовка внутри виджета аддона — и подложки темы ({@link ru.dargen.evoplus.api.ui.theme.SurfaceRenderer}).
  * <p>
  * Рендер EvoPlus не ванильный: за кадр он собирает команды, сортирует их по слою и глубине
  * и только потом отдаёт игре одним проходом. Поэтому рисовать нужно через этот контекст, а не
@@ -66,6 +66,45 @@ public interface RenderContext {
 
     /** Рамка внутрь прямоугольника толщиной {@code thickness}. */
     void outline(double x, double y, double width, double height, double thickness, int argb);
+
+    /**
+     * Прямоугольник со скруглёнными углами (сглаженный край). Радиус ужимается до половины
+     * меньшей стороны.
+     *
+     * @param corners какие углы скруглять — маска {@link ru.dargen.evoplus.api.ui.theme.Surface#TOP_LEFT}
+     *                и соседей; остальные прямые
+     */
+    void roundedRect(double x, double y, double width, double height, double radius, int argb, int corners);
+
+    default void roundedRect(double x, double y, double width, double height, double radius, int argb) {
+        roundedRect(x, y, width, height, radius, argb, 15);
+    }
+
+    /** Скруглённая рамка внутрь прямоугольника толщиной {@code thickness}, без заливки. */
+    void roundedOutline(double x, double y, double width, double height, double radius, double thickness, int argb, int corners);
+
+    default void roundedOutline(double x, double y, double width, double height, double radius, double thickness, int argb) {
+        roundedOutline(x, y, width, height, radius, thickness, argb, 15);
+    }
+
+    /** Скруглённая рамка с вертикальным градиентом: {@code top} у верхнего края, {@code bottom} у нижнего. */
+    void roundedOutline(
+            double x, double y, double width, double height, double radius, double thickness,
+            int top, int bottom, int corners
+    );
+
+    /** Вертикальный градиент: цвет {@code top} у верхнего края переходит в {@code bottom} у нижнего. */
+    void gradient(double x, double y, double width, double height, int top, int bottom);
+
+    /** Скруглённый вертикальный градиент. */
+    void roundedGradient(double x, double y, double width, double height, double radius, int top, int bottom, int corners);
+
+    /**
+     * Мягкая тень вокруг скруглённого прямоугольника: темнее у края, к {@code spread} сходит
+     * на нет. Под самим прямоугольником тень не рисуется — она не просвечивает сквозь
+     * полупрозрачную подложку.
+     */
+    void shadow(double x, double y, double width, double height, double radius, double spread, int argb);
 
     /**
      * Строка шрифтом игры. Понимает коды форматирования {@code §}; {@code argb} — цвет

@@ -1,10 +1,13 @@
 package ru.dargen.evoplus.api.setting;
 
 import ru.dargen.evoplus.api.render.WidgetRenderer;
+import ru.dargen.evoplus.api.ui.Ui;
+import ru.dargen.evoplus.api.ui.UiElement;
 import ru.dargen.evoplus.api.setting.type.BooleanSetting;
 import ru.dargen.evoplus.api.setting.type.ButtonElement;
 import ru.dargen.evoplus.api.setting.type.ChoiceSetting;
 import ru.dargen.evoplus.api.setting.type.ColorSetting;
+import ru.dargen.evoplus.api.setting.type.CustomElement;
 import ru.dargen.evoplus.api.setting.type.DecimalSetting;
 import ru.dargen.evoplus.api.setting.type.EnumSetting;
 import ru.dargen.evoplus.api.setting.type.IntSetting;
@@ -14,6 +17,7 @@ import ru.dargen.evoplus.api.setting.type.TextSetting;
 import ru.dargen.evoplus.api.setting.type.WidgetElement;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -30,6 +34,15 @@ public interface SettingContainer {
     String getName();
 
     List<SettingElement<?>> getElements();
+
+    /**
+     * Скрытый контейнер не показывается в меню настроек (категория — вкладкой, секция —
+     * под своей категорией), но значения хранятся как обычно. Такие настройки открывают
+     * своим окном: {@link Ui#settingsWindow}.
+     */
+    SettingContainer hidden(boolean hidden);
+
+    boolean isHidden();
 
     /** Переключатель. */
     BooleanSetting toggle(String id, String name, boolean value);
@@ -65,6 +78,12 @@ public interface SettingContainer {
 
     /** Кнопка с действием. Значения не хранит. */
     ButtonElement button(String id, String name, String label, Runnable action);
+
+    /**
+     * Строка со своим элементом управления справа — любым элементом {@link Ui}. Элемент
+     * собирается заново при каждом показе строки; значения строка не хранит.
+     */
+    CustomElement custom(String id, String name, Function<Ui, UiElement<?>> control);
 
     /**
      * Виджет HUD размером {@code width x height}: строка с переключателем в настройках и

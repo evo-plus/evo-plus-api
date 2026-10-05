@@ -1,8 +1,8 @@
 # evo-plus-api
 
 API для модов, которые хотят встроиться в [EvoPlus](https://modrinth.com/mod/evoplus): свои
-настройки в меню EvoPlus, свои виджеты HUD в его редакторе виджетов, уведомления и данные
-о сервере.
+настройки в меню EvoPlus, свои виджеты HUD в его редакторе виджетов, свои окна и меню на
+стандартных элементах EvoPlus, уведомления и данные о сервере.
 
 Реализацию отдаёт сам EvoPlus в рантайме, поэтому API подключается как `compileOnly`, а вся
 интеграция держится за точкой входа `evo-plus`: без EvoPlus её никто не вызовет, классы API
@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.evo-plus:evo-plus-api:1.2.0'
+    compileOnly 'com.github.evo-plus:evo-plus-api:1.3.0'
 }
 ```
 
@@ -130,6 +130,7 @@ if (enabled.get()) {
 | `key(id, name, keyBind)` | `KeySetting` | клавиша или кнопка мыши с модификаторами; `onPress`, `isPressed` |
 | `button(id, name, label, action)` | `ButtonElement` | кнопка, значения не хранит |
 | `widget(id, name, width, height, renderer)` | `WidgetElement` | виджет HUD, см. [Виджеты](#виджеты) |
+| `custom(id, name, ui -> элемент)` | `CustomElement` | строка со своим элементом управления из [интерфейса](#интерфейс); собирается при каждом показе |
 
 Общее для всех строк экрана:
 
@@ -155,6 +156,20 @@ settings.onSave(MyConfig::save);
 
 `onSave` зовётся на клиентском потоке, когда игрок закрыл экран настроек аддона или аддон
 сам вызвал `settings.save()`.
+
+### Настройки своим окном
+
+Категорию или секцию можно убрать из меню (`hidden(true)`) — значения хранятся как обычно,
+а показываются окном, которое аддон открывает сам, например кнопкой в своём меню:
+
+```java
+SettingCategory view = settings.category("view", "mymod.settings.view");
+view.hidden(true);
+BooleanSetting compact = view.toggle("compact", "mymod.settings.compact", false);
+
+// Строки те же, что в меню; значения сохраняются при закрытии окна.
+addon.getUi().settingsWindow("mymod.settings.view", view).open();
+```
 
 ### Клавиши
 
@@ -311,6 +326,118 @@ ctx.<GuiGraphicsExtractor>vanilla(graphics -> graphics.fill(0, 0, Math.min(fps, 
   вокруг X и Y — нет.
 - Исключение из действия так же уходит в лог аддона и не роняет кадр.
 
+## Интерфейс
+
+`addon.getUi()` — стандартные элементы EvoPlus: окна, диалоги, кнопки, переключатели, поля,
+списки, прокрутка, головы игроков. Из них собираются свои меню и модалки, и они выглядят
+как окна самого мода: те же цвета, шрифт и скругление, что игрок выбрал в настройках,
+размер окна подстраивается под «Размер интерфейса». Обводки, подложки и наведение
+настраивать не нужно — у каждого элемента они уже есть.
+
+```java
+Ui ui = addon.getUi();
+
+UiWindow window = ui.window("mymod.title", 320, 240, true, true);
+UiContainer content = window.getContent();
+content.add(ui.text("mymod.hello", TextStyle.SECONDARY).maxWidth(window.getBodyWidth() - 20, true));
+
+UiInput name = ui.input("", "mymod.name").fillWidth();
+UiToggle loud = ui.toggle(false).onChange(value -> System.out.println("loud = " + value));
+content.add(ui.sectionHeader("mymod.form"), name, ui.row().add(ui.text("mymod.loud"), loud));
+
+window.getFooter().add(
+        ui.button("mymod.cancel", window::close),
+        ui.button("mymod.save", ButtonStyle.SUCCESS, () -> save(name.getValue())));
+window.open();
+```
+
+### Окна
+
+| Метод | Что это |
+|---|---|
+| `window(title, maxWidth, maxHeight, scrollable, footer)` | окно с шапкой и крестиком; тело — прокручиваемая колонка (окно по высоте содержимого) или свободная область; `footer` — подвал под кнопки |
+| `dialog()` | маленькое окно по центру: колонка по содержимому с крестиком — спросить, подтвердить |
+| `settingsWindow(title, container)` | окно со строками настроек контейнера |
+
+`open()` открывает окно поверх текущего экрана, а без экрана — своим экраном; `openScreen()` —
+всегда своим экраном, как меню. Окно закрывается крестиком, по Esc и через `close()`,
+`onClose` зовётся в любом случае; закрытое окно можно открыть снова. Окна можно открывать
+друг из друга — верхнее размывает те, что под ним.
+
+### Элементы
+
+| Метод | Тип |
+|---|---|
+| `column()`, `row()` | `UiContainer` — колонка и ряд; размер по содержимому, `spacing`, `padding`, `align` |
+| `stack(width, height)` | `UiContainer` — свободная область: дети по `anchor` и `position` |
+| `panel()`, `card(hoverable)` | `UiContainer` — колонка на подложке с рамкой; карточка списка |
+| `scroll(width, height)` | `UiScroll` — прокручиваемая колонка; `scrollToBottom`, `isAtBottom` |
+| `text(text[, style])` | `UiText` — `TITLE`, `BODY`, `SECONDARY`, `MUTED`; `maxWidth(width, wrap)` переносит или обрезает |
+| `button(label, [style,] action)` | `UiButton` — `SECONDARY`, `PRIMARY`, `SUCCESS`, `DANGER`; `enabled(false)` |
+| `iconButton(texture, size, tooltip, action)` | `UiButton` — иконка без подложки |
+| `toggle(value)` | `UiToggle` |
+| `input(value, placeholder)` | `UiInput` — `onChange`, `onSubmit` (Enter, фокус остаётся), `filter`, `maxLength` |
+| `slider(value, min, max, step, decimals)` | `UiSlider` |
+| `select(options, value, names)` | `UiSelect<T>` — выпадающий список |
+| `image(texture, width, height)` | `UiImage` |
+| `head(player, size)` | `UiHead` — лицо игрока: скин из таба сервера или у Mojang по нику |
+| `item(itemStack)` | `UiItem` |
+| `badge(count)` | `UiBadge` — счётчик непрочитанного |
+| `canvas(width, height, renderer)` | `UiCanvas` — своя отрисовка через `RenderContext`, как у виджетов |
+| `divider()`, `sectionHeader(label)`, `spacer(width, height)` | `UiBlock` |
+
+Общее для всех элементов: `size`/`width`/`height`, `widthRelative(доля, сдвиг)` и
+`fillWidth()`/`fillHeight()` — от размера родителя, `anchor` и `position` — место в свободной
+области, `tooltip`, `visible`, `background`/`outline` (ARGB), `onClick`, `onRightClick`,
+`onHover`, `onTick`, `remove()`.
+
+Цвета темы для своей отрисовки — `ui.getTheme()`; уведомление без статического вызова —
+`ui.notify(notification)`.
+
+- Текст везде — ключ локализации или готовая строка.
+- Работать с элементами — с клиентского потока. Исключения из обработчиков EvoPlus ловит и
+  пишет в лог аддона.
+- Элемент лежит только в одном контейнере: `add` в другой переносит его.
+
+### Темы
+
+Игрок выбирает тему в меню «Интерфейс» → «Тема». Встроенные темы — только палитры; аддон
+может добавить свою, и не только цвета: `SurfaceRenderer` рисует подложки сам — окна,
+кнопки, карточки, поля, переключатели, фон виджетов.
+
+```java
+ui.registerTheme(new Theme() {
+    public String getId() { return "sunset"; }          // в настройках — "mymod:sunset"
+    public String getName() { return "mymod.theme"; }
+    public UiTheme getPalette() { return palette; }     // ARGB, можно полупрозрачные
+    public double getCornerRadius() { return 8; }       // своё скругление; -1 — решает игрок
+    public SurfaceRenderer getSurfaceRenderer() {
+        return (context, surface) -> {
+            if (surface.getKind() != SurfaceKind.BUTTON) return false; // остальное — как обычно
+            double h = surface.getHeight();
+            context.roundedRect(0, 0, surface.getWidth(), h, h / 2, surface.getFill());
+            context.roundedOutline(0, 0, surface.getWidth(), h, h / 2, 1, 0x60FFFFFF, 0x10FFFFFF, Surface.ALL_CORNERS);
+            return true;
+        };
+    }
+});
+```
+
+- `Surface` — что рисуем (`SurfaceKind`: окно, всплывающее, карточка, кнопка, поле, дорожка и
+  ползунок переключателя, фон виджета), размер, заливка и обводка, которые выбрал мод (уже из
+  палитры темы), радиус и маска углов, наведение. `false` — EvoPlus нарисует подложку сам.
+- Тема, которая задаёт скругление (`getCornerRadius() >= 0`), прячет переключатель «Скругление».
+- Рендерер зовётся на каждую подложку каждый кадр — без тяжёлой работы. Ошибка в нём
+  выключает рендерер до перезахода, интерфейс рисуется обычной отрисовкой.
+- При смене темы стандартные элементы перекрашиваются сами — и в открытых окнах, и в тех,
+  что аддон держит и открывает повторно. Цвета, которые аддон смешивает сам, пересобирайте в
+  `ui.onThemeChange(...)`.
+- Сохранённая тема аддона включается, как только аддон её зарегистрирует. Регистрация с тем
+  же id заменяет тему.
+- Для рендерера в `RenderContext` есть `roundedRect`, `roundedOutline` (в т.ч. с градиентом),
+  `gradient`, `roundedGradient`, `shadow` — ими же можно рисовать в виджетах.
+- Пример целиком — аддон Liquid Glass (`evo-liquid-glass`).
+
 ## Прочее
 
 ```java
@@ -329,6 +456,7 @@ Location location = EvoPlusApi.getLocation(); // текущая локация
 
 | Версия | Что нового |
 |---|---|
+| 1.3.0 | интерфейс: окна, диалоги и элементы EvoPlus (`Addon.getUi()`), `custom` и скрытые категории настроек, `settingsWindow`; темы (`Ui.registerTheme`, `SurfaceRenderer`), скругления, градиенты и тени в `RenderContext` |
 | 1.2.0 | виджеты аддонов, `RenderContext` |
 | 1.1.0 | аддоны: точка входа `evo-plus`, настройки |
 | 1.0.x | уведомления, сервер и локация |

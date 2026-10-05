@@ -1,6 +1,7 @@
 package ru.dargen.evoplus.api.addon;
 
 import ru.dargen.evoplus.api.setting.AddonSettings;
+import ru.dargen.evoplus.api.ui.Ui;
 
 /**
  * Мод, подключённый к EvoPlus. Идентифицируется по id мода из fabric.mod.json:
@@ -20,5 +21,11 @@ public interface Addon {
      * EvoPlus у карточки аддона появляется кнопка «Настройки».
      */
     AddonSettings getSettings();
+
+    /**
+     * Стандартные элементы интерфейса EvoPlus — для своих окон, меню и модалок. Ошибки в
+     * обработчиках элементов пишутся в лог этого аддона.
+     */
+    Ui getUi();
 
 }
