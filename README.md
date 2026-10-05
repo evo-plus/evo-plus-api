@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.evo-plus:evo-plus-api:1.3.0'
+    compileOnly 'com.github.evo-plus:evo-plus-api:1.4.0'
 }
 ```
 
@@ -452,10 +452,21 @@ Server server = EvoPlusApi.getServer();      // текущий сервер
 Location location = EvoPlusApi.getLocation(); // текущая локация
 ```
 
+### Файлы аддона
+
+Свои файлы (кеш, история, скачанные утилиты) кладите в `addon.getAddonFolder()` —
+это `evo-plus/addons/<id>` рядом с файлом настроек, а не корень игры. Папка создаётся
+при первом обращении.
+
+```java
+Path history = addon.getAddonFolder().resolve("history.json");
+```
+
 ## Версии
 
 | Версия | Что нового |
 |---|---|
+| 1.4.0 | `Addon.getAddonFolder()` — папка для файлов аддона в `evo-plus/addons/<id>` |
 | 1.3.0 | интерфейс: окна, диалоги и элементы EvoPlus (`Addon.getUi()`), `custom` и скрытые категории настроек, `settingsWindow`; темы (`Ui.registerTheme`, `SurfaceRenderer`), скругления, градиенты и тени в `RenderContext` |
 | 1.2.0 | виджеты аддонов, `RenderContext` |
 | 1.1.0 | аддоны: точка входа `evo-plus`, настройки |
