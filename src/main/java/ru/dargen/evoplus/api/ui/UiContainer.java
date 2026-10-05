@@ -14,6 +14,9 @@ public interface UiContainer extends UiElement<UiContainer> {
     /** Добавляет ребёнка и отдаёт его же — удобно сразу сохранить в переменную. */
     <T extends UiElement<?>> T append(T child);
 
+    /** Вставляет детей перед ребёнком с номером {@code index} (0 — в начало). */
+    UiContainer insert(int index, UiElement<?>... children);
+
     UiContainer remove(UiElement<?> child);
 
     UiContainer clear();

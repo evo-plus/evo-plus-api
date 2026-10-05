@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.evo-plus:evo-plus-api:1.4.1'
+    compileOnly 'com.github.evo-plus:evo-plus-api:1.5.0'
 }
 ```
 
@@ -371,7 +371,7 @@ window.open();
 | `column()`, `row()` | `UiContainer` — колонка и ряд; размер по содержимому, `spacing`, `padding`, `align` |
 | `stack(width, height)` | `UiContainer` — свободная область: дети по `anchor` и `position` |
 | `panel()`, `card(hoverable)` | `UiContainer` — колонка на подложке с рамкой; карточка списка |
-| `scroll(width, height)` | `UiScroll` — прокручиваемая колонка; `scrollToBottom`, `isAtBottom` |
+| `scroll(width, height)` | `UiScroll` — прокручиваемая колонка; `scrollToBottom`, `isAtBottom`, `getScrollOffset`/`getMaxScroll`, `keepInView` (ребёнок стоит на месте, пока вокруг подгружают), `reveal` |
 | `text(text[, style])` | `UiText` — `TITLE`, `BODY`, `SECONDARY`, `MUTED`; `maxWidth(width, wrap)` переносит или обрезает |
 | `button(label, [style,] action)` | `UiButton` — `SECONDARY`, `PRIMARY`, `SUCCESS`, `DANGER`; `enabled(false)` |
 | `iconButton(texture, size, tooltip, action)` | `UiButton` — иконка без подложки |
@@ -466,6 +466,7 @@ Path history = addon.getAddonFolder().resolve("history.json");
 
 | Версия | Что нового |
 |---|---|
+| 1.5.0 | прокрутка: `getScrollOffset`, `getMaxScroll`, `keepInView`, `reveal` — для подгрузки длинных списков частями; `UiContainer.insert` |
 | 1.4.1 | сборка на JitPack (без изменений API) |
 | 1.4.0 | `Addon.getAddonFolder()` — папка для файлов аддона в `evo-plus/addons/<id>` |
 | 1.3.0 | интерфейс: окна, диалоги и элементы EvoPlus (`Addon.getUi()`), `custom` и скрытые категории настроек, `settingsWindow`; темы (`Ui.registerTheme`, `SurfaceRenderer`), скругления, градиенты и тени в `RenderContext` |
