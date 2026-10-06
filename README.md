@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.evo-plus:evo-plus-api:1.7.0'
+    compileOnly 'com.github.evo-plus:evo-plus-api:1.8.0'
 }
 ```
 
@@ -198,6 +198,16 @@ WidgetElement clock = general.widget("clock", "mymod.widget.clock", 80, 20, ctx 
 
 clock.size(120, 20);     // размер можно менять на ходу
 clock.setEnabled(true);  // показать без участия игрока
+```
+
+Умолчания вида задаются сразу при создании: фон под виджетом (по умолчанию нет) и можно ли
+двигать его мышью в открытом чате (по умолчанию можно). Игрок потом меняет оба в окне
+настроек виджета. Перемещение в чате выключают виджетам, по которым в чате кликают:
+
+```java
+WidgetElement timers = general.widget("timers", "mymod.widget.timers", 120, 60, renderer)
+        .defaultBackground(true)
+        .chatMovable(false);
 ```
 
 Рендерер зовётся каждый кадр, пока виджет на экране: в HUD, в редакторе и в его списке.
@@ -482,6 +492,7 @@ account.resolveDomain("api").thenAccept(domain -> {
 
 | Версия | Что нового |
 |---|---|
+| 1.8.0 | `WidgetElement.defaultBackground`, `chatMovable` — умолчания фона и перемещения в чате для своего виджета |
 | 1.7.0 | `Addon.getAccount()` — ник, игровой токен, регион и домены сервисов EvoPlus: аддон ходит в свои сервисы от имени игрока |
 | 1.6.0 | `CustomElement.pinnable` — строку можно закрепить над списком настроек, чтобы превью было видно при прокрутке; `Addon.getSharing()` — входящие шары игроков (настройки, таймеры и чёрный список боссов) и окно принятия настроек по коду; `RenderContext.roundedScissor` — обрезка по скруглённой рамке |
 | 1.5.0 | прокрутка: `getScrollOffset`, `getMaxScroll`, `keepInView`, `reveal` — для подгрузки длинных списков частями; `UiContainer.insert` |

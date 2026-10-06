@@ -26,4 +26,25 @@ public interface WidgetElement extends SettingElement<WidgetElement> {
 
     void setEnabled(boolean enabled);
 
+    /**
+     * Фон под виджетом, пока игрок не выбрал сам (в окне настроек виджета). По умолчанию фона
+     * нет. Задавайте сразу при создании виджета, до того как игрок его увидит.
+     *
+     * @since 1.8.0
+     */
+    default WidgetElement defaultBackground(boolean background) {
+        return this;
+    }
+
+    /**
+     * Можно ли двигать виджет мышью в открытом чате, пока игрок не выбрал сам. По умолчанию
+     * можно; выключите виджету, по которому в чате кликают, — иначе перетаскивание забирает
+     * клик. Задавайте сразу при создании виджета.
+     *
+     * @since 1.8.0
+     */
+    default WidgetElement chatMovable(boolean movable) {
+        return this;
+    }
+
 }
