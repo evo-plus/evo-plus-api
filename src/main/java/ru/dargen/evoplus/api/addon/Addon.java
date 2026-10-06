@@ -1,6 +1,8 @@
 package ru.dargen.evoplus.api.addon;
 
+import ru.dargen.evoplus.api.account.Account;
 import ru.dargen.evoplus.api.setting.AddonSettings;
+import ru.dargen.evoplus.api.share.Sharing;
 import ru.dargen.evoplus.api.ui.Ui;
 
 import java.nio.file.Path;
@@ -36,5 +38,11 @@ public interface Addon {
      * корне игры. Создаётся при первом обращении.
      */
     Path getAddonFolder();
+
+    /** Чем делятся игроки: входящие настройки и таймеры боссов, окно принятия настроек. */
+    Sharing getSharing();
+
+    /** Аккаунт игрока: ник, игровой токен и домены сервисов — для своих сервисов аддона. */
+    Account getAccount();
 
 }

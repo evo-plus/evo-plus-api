@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.evo-plus:evo-plus-api:1.5.0'
+    compileOnly 'com.github.evo-plus:evo-plus-api:1.7.0'
 }
 ```
 
@@ -130,7 +130,7 @@ if (enabled.get()) {
 | `key(id, name, keyBind)` | `KeySetting` | клавиша или кнопка мыши с модификаторами; `onPress`, `isPressed` |
 | `button(id, name, label, action)` | `ButtonElement` | кнопка, значения не хранит |
 | `widget(id, name, width, height, renderer)` | `WidgetElement` | виджет HUD, см. [Виджеты](#виджеты) |
-| `custom(id, name, ui -> элемент)` | `CustomElement` | строка со своим элементом управления из [интерфейса](#интерфейс); собирается при каждом показе |
+| `custom(id, name, ui -> элемент)` | `CustomElement` | строка со своим элементом управления из [интерфейса](#интерфейс); собирается при каждом показе; `pinnable(true)` — её можно закрепить над списком (превью) |
 
 Общее для всех строк экрана:
 
@@ -255,6 +255,7 @@ public final class StatusWidget implements WidgetRenderer {
 | `push()` / `pop()` | сохранить и вернуть трансформацию |
 | `translate(x, y)`, `scale(x, y)`, `rotate(degrees)` | трансформации; поворот по часовой стрелке |
 | `scissor(x, y, w, h)` / `popScissor()` | обрезка; вложенная пересекается с внешней |
+| `roundedScissor(x, y, w, h, radius)` | обрезка со скруглёнными углами: заливки не вылезают за скруглённую рамку; снимается тем же `popScissor()` |
 | `rect(x, y, w, h, argb)` | залитый прямоугольник |
 | `outline(x, y, w, h, thickness, argb)` | рамка внутрь прямоугольника |
 | `text(text, x, y, argb, shadow)` | строка шрифтом игры, понимает коды `§` |
@@ -462,10 +463,27 @@ Location location = EvoPlusApi.getLocation(); // текущая локация
 Path history = addon.getAddonFolder().resolve("history.json");
 ```
 
+### Аккаунт и свои сервисы
+
+`addon.getAccount()` — ник игрока, игровой токен EvoPlus и домены сервисов его региона.
+Токен приходит от сервера при входе и обновляется — берите его перед каждым запросом;
+до первого входа он `null`. Сервис проверяет токен открытым ключом EvoPlus, ник — claim `sub`.
+
+```java
+Account account = addon.getAccount();
+account.resolveDomain("api").thenAccept(domain -> {
+    String token = account.getToken();
+    if (token == null) return;
+    // wss://<domain>/call/ws с заголовком X-Game-Token: <token>
+});
+```
+
 ## Версии
 
 | Версия | Что нового |
 |---|---|
+| 1.7.0 | `Addon.getAccount()` — ник, игровой токен, регион и домены сервисов EvoPlus: аддон ходит в свои сервисы от имени игрока |
+| 1.6.0 | `CustomElement.pinnable` — строку можно закрепить над списком настроек, чтобы превью было видно при прокрутке; `Addon.getSharing()` — входящие шары игроков (настройки, таймеры и чёрный список боссов) и окно принятия настроек по коду; `RenderContext.roundedScissor` — обрезка по скруглённой рамке |
 | 1.5.0 | прокрутка: `getScrollOffset`, `getMaxScroll`, `keepInView`, `reveal` — для подгрузки длинных списков частями; `UiContainer.insert` |
 | 1.4.1 | сборка на JitPack (без изменений API) |
 | 1.4.0 | `Addon.getAddonFolder()` — папка для файлов аддона в `evo-plus/addons/<id>` |

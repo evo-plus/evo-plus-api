@@ -59,6 +59,18 @@ public interface RenderContext {
 
     void popScissor();
 
+    /**
+     * Как {@link #scissor}, только со скруглёнными углами радиуса {@code radius}: заливки и
+     * текстуры не вылезают за скруглённую рамку превью или карточки. Ванильное
+     * ({@link #text}, {@link #item}, {@link #vanilla}) режется только прямоугольником.
+     * Снять — тем же {@link #popScissor()}.
+     *
+     * @since 1.6.0
+     */
+    default void roundedScissor(double x, double y, double width, double height, double radius) {
+        scissor(x, y, width, height);
+    }
+
     // ── примитивы ──────────────────────────────────────────────────────────────────
 
     /** Залитый прямоугольник. */
