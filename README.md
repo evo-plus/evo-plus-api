@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.evo-plus:evo-plus-api:1.8.0'
+    compileOnly 'com.github.evo-plus:evo-plus-api:1.9.0'
 }
 ```
 
@@ -180,6 +180,10 @@ general.key("toggle-hud", "mymod.settings.toggle-hud", KeyBind.keyboard(GLFW.GLF
 
 `onPress` срабатывает один раз на нажатие и не срабатывает, пока открыт экран, — как бинды
 самой игры. `modifiers(false)` убирает модификаторы из выбора клавиши.
+
+Модификаторы — `SHIFT`, `CONTROL`, `ALT` и с 1.9.0 `SUPER` (Cmd на macOS, Win на Windows).
+Если у двух привязок одна клавиша, на сочетании срабатывает только более полная: при
+биндах F9 и Shift + F9 нажатие Shift + F9 не запускает F9.
 
 ## Виджеты
 
@@ -436,7 +440,8 @@ ui.registerTheme(new Theme() {
 
 - `Surface` — что рисуем (`SurfaceKind`: окно, всплывающее, карточка, кнопка, поле, дорожка и
   ползунок переключателя, фон виджета), размер, заливка и обводка, которые выбрал мод (уже из
-  палитры темы), радиус и маска углов, наведение. `false` — EvoPlus нарисует подложку сам.
+  палитры темы), радиус и маска углов, наведение. У фона виджета `getWidgetId()` — id виджета
+  из конфига (`boss-timer/widget`), у остальных подложек null. `false` — EvoPlus нарисует подложку сам.
 - Тема, которая задаёт скругление (`getCornerRadius() >= 0`), прячет переключатель «Скругление».
 - Рендерер зовётся на каждую подложку каждый кадр — без тяжёлой работы. Ошибка в нём
   выключает рендерер до перезахода, интерфейс рисуется обычной отрисовкой.
@@ -473,6 +478,24 @@ Location location = EvoPlusApi.getLocation(); // текущая локация
 Path history = addon.getAddonFolder().resolve("history.json");
 ```
 
+### Общие ресурсы
+
+Инструменты, нужные нескольким аддонам (ffmpeg, yt-dlp…), ставьте не в свою папку, а в
+общую: `addon.getShared()` — это `evo-plus/shared/<имя>`, одна копия на все аддоны. Установка
+идёт под блокировкой: второй аддон дождётся первого и возьмёт готовое. То, что аддон уже
+скачивал раньше к себе, передайте в `adopt` — оно перенесётся, а не скачается заново.
+
+```java
+Path folder = addon.getShared().resolve("ffmpeg",
+        List.of(addon.getAddonFolder().resolve("bin/ffmpeg")),
+        target -> download(FFMPEG_URL, target));
+Path ffmpeg = folder.resolve("ffmpeg");
+```
+
+Звать с фонового потока. Принятые имена: `ffmpeg` (исполняемый `ffmpeg`/`ffmpeg.exe` в корне
+папки), `yt-dlp` (сборка onedir), `deno`. В EvoPlus с API ниже 1.9.0 метода нет — ловите
+`LinkageError` и ставьте по старинке.
+
 ### Аккаунт и свои сервисы
 
 `addon.getAccount()` — ник игрока, игровой токен EvoPlus и домены сервисов его региона.
@@ -492,6 +515,7 @@ account.resolveDomain("api").thenAccept(domain -> {
 
 | Версия | Что нового |
 |---|---|
+| 1.9.0 | `KeyBind.SUPER` — Cmd/Win в сочетаниях клавиш; `Addon.getShared()` — общие ресурсы аддонов (ffmpeg и др.) с переносом уже скачанного; `Surface.getWidgetId()` — какой виджет под подложкой |
 | 1.8.0 | `WidgetElement.defaultBackground`, `chatMovable` — умолчания фона и перемещения в чате для своего виджета |
 | 1.7.0 | `Addon.getAccount()` — ник, игровой токен, регион и домены сервисов EvoPlus: аддон ходит в свои сервисы от имени игрока |
 | 1.6.0 | `CustomElement.pinnable` — строку можно закрепить над списком настроек, чтобы превью было видно при прокрутке; `Addon.getSharing()` — входящие шары игроков (настройки, таймеры и чёрный список боссов) и окно принятия настроек по коду; `RenderContext.roundedScissor` — обрезка по скруглённой рамке |

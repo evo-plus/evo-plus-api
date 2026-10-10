@@ -7,13 +7,20 @@ import java.util.Objects;
  * <p>
  * Коды — GLFW: {@code GLFW_KEY_*} для клавиатуры, {@code GLFW_MOUSE_BUTTON_*} для мыши.
  * Модификаторы — битовая маска в той же конвенции, что и {@code mods} у событий GLFW
- * ({@link #SHIFT}, {@link #CONTROL}, {@link #ALT}).
+ * ({@link #SHIFT}, {@link #CONTROL}, {@link #ALT}, {@link #SUPER}).
  */
 public final class KeyBind {
 
     public static final int SHIFT = 0x1;
     public static final int CONTROL = 0x2;
     public static final int ALT = 0x4;
+    /**
+     * Cmd на macOS, Win на Windows, Super на Linux. EvoPlus с API ниже 1.9.0 этот модификатор не
+     * знает: сочетание с ним там срабатывает как без него.
+     *
+     * @since 1.9.0
+     */
+    public static final int SUPER = 0x8;
 
     /** Ничего не привязано. */
     public static final KeyBind NONE = new KeyBind(Type.KEYBOARD, -1, 0);
@@ -34,7 +41,7 @@ public final class KeyBind {
     private KeyBind(Type type, int code, int modifiers) {
         this.type = Objects.requireNonNull(type, "type");
         this.code = code;
-        this.modifiers = modifiers & (SHIFT | CONTROL | ALT);
+        this.modifiers = modifiers & (SHIFT | CONTROL | ALT | SUPER);
     }
 
     public static KeyBind keyboard(int key) {

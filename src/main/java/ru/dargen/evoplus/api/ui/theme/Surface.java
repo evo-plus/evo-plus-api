@@ -42,4 +42,11 @@ public interface Surface {
     /** Курсор над подложкой. */
     boolean isHovered();
 
+    /**
+     * Виджет HUD под подложкой — его id из конфига: `boss-timer/widget`, `rune/active-runes-widget`,
+     * у виджетов аддонов `<modId>:<категория>/<id>`. Так тема рисует фон отдельного виджета
+     * по-своему. У остальных подложек — null.
+     */
+    String getWidgetId();
+
 }

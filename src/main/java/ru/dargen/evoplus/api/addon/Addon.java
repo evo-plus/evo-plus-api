@@ -3,6 +3,7 @@ package ru.dargen.evoplus.api.addon;
 import ru.dargen.evoplus.api.account.Account;
 import ru.dargen.evoplus.api.setting.AddonSettings;
 import ru.dargen.evoplus.api.share.Sharing;
+import ru.dargen.evoplus.api.shared.SharedResources;
 import ru.dargen.evoplus.api.ui.Ui;
 
 import java.nio.file.Path;
@@ -44,5 +45,14 @@ public interface Addon {
 
     /** Аккаунт игрока: ник, игровой токен и домены сервисов — для своих сервисов аддона. */
     Account getAccount();
+
+    /**
+     * Ресурсы, общие для всех аддонов: инструменты вроде ffmpeg ставятся один раз на всех.
+     * В EvoPlus с API ниже 1.9.0 метода нет — вызов бросает {@link LinkageError}, это стоит
+     * ловить, если аддон должен работать и там.
+     *
+     * @since 1.9.0
+     */
+    SharedResources getShared();
 
 }
