@@ -10,7 +10,7 @@ public interface TextSetting extends Setting<String, TextSetting> {
     /** Подсказка в пустом поле. Ключ локализации или готовая строка. */
     TextSetting placeholder(String placeholder);
 
-    /** Предел длины; по умолчанию 256. */
+    /** Предел длины; по умолчанию 32767 (до EvoPlus 3.3.5 было 256). */
     TextSetting maxLength(int maxLength);
 
     /**

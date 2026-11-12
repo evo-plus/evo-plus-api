@@ -4,6 +4,7 @@ import ru.dargen.evoplus.api.account.Account;
 import ru.dargen.evoplus.api.setting.AddonSettings;
 import ru.dargen.evoplus.api.share.Sharing;
 import ru.dargen.evoplus.api.shared.SharedResources;
+import ru.dargen.evoplus.api.social.Social;
 import ru.dargen.evoplus.api.ui.Ui;
 
 import java.nio.file.Path;
@@ -54,5 +55,14 @@ public interface Addon {
      * @since 1.9.0
      */
     SharedResources getShared();
+
+    /**
+     * Друзья, заявки, ЧС и личные сообщения игрока пакетами сервера. На старых серверах
+     * {@link Social#isAvailable()} ложен. В EvoPlus с API ниже 1.10.0 метода нет — вызов бросает
+     * {@link LinkageError}.
+     *
+     * @since 1.10.0
+     */
+    Social getSocial();
 
 }

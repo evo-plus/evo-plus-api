@@ -16,7 +16,7 @@ public interface UiInput extends UiElement<UiInput> {
 
     UiInput placeholder(String placeholder);
 
-    /** Предел длины; по умолчанию 256. */
+    /** Предел длины; по умолчанию 32767 (до EvoPlus 3.3.5 было 256). */
     UiInput maxLength(int maxLength);
 
     /** Какие строки можно ввести: ввод, после которого текст не проходит проверку, отбрасывается. */
